@@ -1,25 +1,50 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import { getSuggestions } from './api/api';
 import './App.css';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [design, setDesign] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    const handleInputChange = (e) => {
+        setDesign(e.target.value);
+    };
+
+    const handleGetSuggestions = async () => {
+        setLoading(true);
+        const response = await getSuggestions({ design });
+        setSuggestions(response.data);
+        setLoading(false);
+    };
+
+    return (
+        <div className="App">
+            <div className="header">
+                <h1>AI Design Assistant</h1>
+                <p>Enhance your designs with AI suggestions</p>
+            </div>
+            <div className="container">
+                <textarea
+                    value={design}
+                    onChange={handleInputChange}
+                    placeholder="Paste your design data here..."
+                />
+                <button onClick={handleGetSuggestions} disabled={loading}>
+                    Get Suggestions
+                    {loading && <div className="spinner"></div>}
+                </button>
+                <div className="suggestions">
+                    {suggestions.map((suggestion, index) => (
+                        <div className="suggestion" key={index}>
+                            <span className="suggestion-icon">&#128396;</span>
+                            {suggestion}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
 }
 
 export default App;
